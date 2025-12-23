@@ -8,17 +8,17 @@ import java.util.List;
 @Service
 public class FraudRuleService {
 
-    private final FraudRuleRepository fraudRuleRepository;
+    private final FraudRuleRepository repository;
 
-    public FraudRuleService(FraudRuleRepository fraudRuleRepository) {
-        this.fraudRuleRepository = fraudRuleRepository;
+    public FraudRuleService(FraudRuleRepository repository) {
+        this.repository = repository;
     }
 
     public FraudRule addRule(FraudRule rule) {
-        return fraudRuleRepository.save(rule);
+        return repository.save(rule);
     }
 
     public List<FraudRule> getAllRules() {
-        return fraudRuleRepository.findAll();
+        return repository.findAll();
     }
 }

@@ -4,6 +4,7 @@ import com.example.demo.model.FraudRule;
 import com.example.demo.repository.FraudRuleRepository;
 import com.example.demo.service.FraudRuleService;
 import org.springframework.stereotype.Service;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -18,10 +19,15 @@ public class FraudRuleServiceImpl implements FraudRuleService {
 
     @Override
     public FraudRule addRule(FraudRule rule) {
-        // Test Logic: Check valid severity
-        if (!VALID_SEVERITIES.contains(rule.getSeverity())) {
-            throw new IllegalArgumentException("Invalid severity level");
+        // Validation: Severity must be standard
+        if (rule.getSeverity() != null && !VALID_SEVERITIES.contains(rule.getSeverity())) {
+            throw new IllegalArgumentException("Invalid severity level: " + rule.getSeverity());
         }
         return fraudRuleRepository.save(rule);
+    }
+
+    @Override
+    public List<FraudRule> getAllRules() {
+        return fraudRuleRepository.findAll();
     }
 }

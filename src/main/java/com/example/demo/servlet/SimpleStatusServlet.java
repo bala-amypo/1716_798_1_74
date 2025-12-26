@@ -11,7 +11,7 @@ public class SimpleStatusServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        // Requirement: Return status 200 and body text "OK"
+        // Returns a raw 200 OK status with text body "OK"
         resp.setStatus(200);
         resp.getWriter().write("OK");
     }

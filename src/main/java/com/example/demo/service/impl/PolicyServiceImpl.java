@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Policy;
 import com.example.demo.model.User;
 import com.example.demo.repository.PolicyRepository;
@@ -21,17 +22,20 @@ public class PolicyServiceImpl implements PolicyService {
 
     @Override
     public Policy createPolicy(Long userId, Policy policy) {
-        // Test Logic: Check invalid dates
-        if (policy.getEndDate().isBefore(policy.getStartDate())) {
+        // Validation: End date cannot be before start date
+        if (policy.getEndDate() != null && policy.getStartDate() != null && 
+            policy.getEndDate().isBefore(policy.getStartDate())) {
             throw new IllegalArgumentException("End date cannot be before start date");
         }
-        // Test Logic: Check unique policy number
+        // Validation: Policy number must be unique
         if (policyRepository.existsByPolicyNumber(policy.getPolicyNumber())) {
             throw new IllegalArgumentException("Policy number already exists");
         }
 
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         policy.setUser(user);
+        
         return policyRepository.save(policy);
     }
 

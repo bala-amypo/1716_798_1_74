@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Claim;
 import com.example.demo.model.Policy;
 import com.example.demo.repository.ClaimRepository;
@@ -21,22 +22,25 @@ public class ClaimServiceImpl implements ClaimService {
 
     @Override
     public Claim createClaim(Long policyId, Claim claim) {
-        // Test Logic: Future date check
+        // Validation: Cannot be in future
         if (claim.getClaimDate().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Claim date cannot be in the future");
         }
-        // Test Logic: Negative amount check
+        // Validation: Cannot be negative
         if (claim.getClaimAmount() < 0) {
             throw new IllegalArgumentException("Claim amount cannot be negative");
         }
 
-        Policy policy = policyRepository.findById(policyId).orElseThrow();
+        Policy policy = policyRepository.findById(policyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Policy not found with id: " + policyId));
         claim.setPolicy(policy);
+        
         return claimRepository.save(claim);
     }
 
     @Override
     public Claim getClaim(Long id) {
-        return claimRepository.findById(id).orElseThrow();
+        return claimRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Claim not found with id: " + id));
     }
 }

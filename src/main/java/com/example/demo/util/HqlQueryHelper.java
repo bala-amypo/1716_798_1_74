@@ -1,18 +1,36 @@
 package com.example.demo.util;
 
 import com.example.demo.model.Claim;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Component;
 import java.util.List;
 
-// This class is Mocked in the test, so the implementation here can be basic
-// or the one provided in previous steps. The test only cares that the class and methods exist.
 @Component
 public class HqlQueryHelper {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    /**
+     * Requirement: Use HQL to find claims containing a specific keyword description.
+     * Logic: Case-insensitive search using LIKE.
+     */
     public List<Claim> findClaimsByDescriptionKeyword(String keyword) {
-        return List.of(); 
+        String hql = "FROM Claim c WHERE LOWER(c.description) LIKE LOWER(:keyword)";
+        TypedQuery<Claim> query = entityManager.createQuery(hql, Claim.class);
+        query.setParameter("keyword", "%" + keyword + "%");
+        return query.getResultList();
     }
 
+    /**
+     * Requirement: Use HQL to find claims exceeding a certain amount.
+     */
     public List<Claim> findHighValueClaims(Double minAmount) {
-        return List.of();
+        String hql = "FROM Claim c WHERE c.claimAmount > :minAmount";
+        TypedQuery<Claim> query = entityManager.createQuery(hql, Claim.class);
+        query.setParameter("minAmount", minAmount);
+        return query.getResultList();
     }
 }

@@ -16,9 +16,9 @@ public class PolicyController {
         this.policyService = policyService;
     }
 
-    @PostMapping
-    public ResponseEntity<Policy> createPolicy(@RequestBody Policy policy) {
-        return ResponseEntity.ok(policyService.createPolicy(policy));
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<Policy> createPolicy(@PathVariable Long userId, @RequestBody Policy policy) {
+        return ResponseEntity.ok(policyService.createPolicy(userId, policy));
     }
 
     @GetMapping("/user/{userId}")

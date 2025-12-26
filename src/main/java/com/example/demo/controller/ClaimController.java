@@ -15,9 +15,9 @@ public class ClaimController {
         this.claimService = claimService;
     }
 
-    @PostMapping
-    public ResponseEntity<Claim> submitClaim(@RequestBody Claim claim) {
-        return ResponseEntity.ok(claimService.createClaim(claim));
+    @PostMapping("/policy/{policyId}")
+    public ResponseEntity<Claim> submitClaim(@PathVariable Long policyId, @RequestBody Claim claim) {
+        return ResponseEntity.ok(claimService.createClaim(policyId, claim));
     }
 
     @GetMapping("/{id}")

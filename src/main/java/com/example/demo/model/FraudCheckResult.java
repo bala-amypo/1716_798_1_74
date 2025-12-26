@@ -12,17 +12,13 @@ public class FraudCheckResult {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "claim_id")
     private Claim claim;
 
     private Boolean isFraudulent;
     private String triggeredRuleName;
     private String rejectionReason;
-
+    
+    // Test requires access to matchedRules string
+    private String matchedRules;
     private LocalDateTime checkedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        checkedAt = LocalDateTime.now();
-    }
 }

@@ -6,11 +6,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Component
 public class JwtUtil {
@@ -26,6 +29,37 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
+    // ==========================================
+    // Methods Required by Application (Filter)
+    // ==========================================
+    
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    // Standard Spring Security validation (Used by Filter)
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    private Boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    // ==========================================
+    // Methods Required by Tests
+    // ==========================================
+
     // REQUIRED METHOD for Test
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
@@ -34,20 +68,24 @@ public class JwtUtil {
         return createToken(claims, user.getEmail());
     }
 
-    // REQUIRED METHOD for Test
+    // REQUIRED METHOD for Test (Alias for extractUsername)
     public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSignKey()).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        return extractUsername(token);
     }
 
+    // REQUIRED METHOD for Test (Simple validation)
     public Boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
-            return true;
+            return !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
     }
+
+    // ==========================================
+    // Private Helpers
+    // ==========================================
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
@@ -57,6 +95,10 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+    
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
     }
 
     private Key getSignKey() {

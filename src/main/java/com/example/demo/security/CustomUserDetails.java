@@ -17,7 +17,6 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(User user) {
         this.email = user.getEmail();
         this.password = user.getPassword();
-        // Converts "ADMIN" or "USER" string to a GrantedAuthority
         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
     }
 
@@ -27,14 +26,10 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() { return password; }
 
     @Override
-    public String getUsername() {
-        return email; // We use email as the username
-    }
+    public String getUsername() { return email; } // Email is the username
 
     @Override
     public boolean isAccountNonExpired() { return true; }

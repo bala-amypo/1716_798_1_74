@@ -26,8 +26,8 @@ public class Claim {
     private String description;
     private String status = "PENDING";
 
-    // Mapped for Many-to-Many test requirement
-    @ManyToMany
+    // Many-to-Many relationship required by Test Group "manyToMany"
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "claim_rules",
         joinColumns = @JoinColumn(name = "claim_id"),
@@ -35,6 +35,7 @@ public class Claim {
     )
     private Set<FraudRule> suspectedRules = new HashSet<>();
 
+    // Constructor required by DemoApplicationTests
     public Claim(Policy policy, LocalDate claimDate, Double claimAmount, String description) {
         this.policy = policy;
         this.claimDate = claimDate;

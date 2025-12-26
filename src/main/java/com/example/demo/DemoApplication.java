@@ -5,8 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 
 @SpringBootApplication
-@ServletComponentScan // Required to activate the @WebServlet
+@ServletComponentScan // Critical: Enables scanning for @WebServlet classes
 public class DemoApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);
     }
